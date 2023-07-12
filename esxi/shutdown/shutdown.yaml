@@ -1,0 +1,38 @@
+---
+- name: Run multiple commands on ESXi host
+  hosts: "*"
+  gather_facts: yes
+  become: true
+  tasks:
+
+    - name: transfer files 
+      become: true                 
+      copy:
+        src: shutdown.sh
+        dest: /root/
+      tags:
+        copy
+
+    - name: make script executable using chmod     
+      shell: |
+        chmod u+x /root/shutdown.sh
+      tags:
+        executable
+    
+    - name: Shutdown all the vms in esxi using script  
+      shell: |
+           ./root/shutdown.sh
+      tags:
+        shutdown
+    
+    - name: Vmware ESXI Shutdown gracefully
+      command:  "/sbin/poweroff"
+      ignore_errors: true   
+      when: false 
+      tags:
+        shutdown the esxi hosts
+
+    
+
+  vars:
+    ansible_become_pass: ********
